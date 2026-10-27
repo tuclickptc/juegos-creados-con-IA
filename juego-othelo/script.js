@@ -9,6 +9,9 @@ const boardElement = document.getElementById('game-board');
 const playerTurnElement = document.getElementById('player-turn');
 const startGameButton = document.getElementById('start-game');
 const addPlayerButton = document.getElementById('add-player');
+const restartButton = document.createElement('button'); // Botón de reinicio
+restartButton.textContent = 'Reiniciar Juego';
+boardElement.appendChild(restartButton);
 
 // Inicializar el tablero
 function initBoard() {
@@ -128,8 +131,63 @@ function switchPlayer() {
 
 // Verificar si el juego ha terminado
 function checkGameOver() {
-    // Lógica para verificar si no hay movimientos válidos
-    // y finalizar el juego
+    let hasValidMove = false;
+
+    // Verificar si hay movimientos válidos para ambos jugadores
+    for (let player of [1, 2]) {
+        currentPlayer = player;
+        for (let row = 0; row < 12 && !hasValidMove; row++) {
+            for (let col = 0; col < 12 && !hasValidMove; col++) {
+                if (isValidMove(row, col)) {
+                    hasValidMove = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Si no hay movimientos válidos para ninguno de los jugadores
+    if (!hasValidMove) {
+        gameActive = false;
+        const winner = determineWinner();
+        alert(`El juego ha terminado! ${winner}`);
+        return;
+    }
+
+    // Verificar si el tablero está lleno (opcional)
+    let boardFull = true;
+    for (let row = 0; row < 12 && boardFull; row++) {
+        for (let col = 0; col < 12 && boardFull; col++) {
+            if (board[row][col] === 0) {
+                boardFull = false;
+                break;
+            }
+        }
+    }
+
+    // Si el tablero está lleno, finalizar el juego
+    if (boardFull) {
+        gameActive = false;
+        const winner = determineWinner();
+        alert(`El juego ha terminado! ${winner}`);
+    }
+}
+
+// Determinar quién ganó
+function determineWinner() {
+    let blackCount = 0;
+    let whiteCount = 0;
+
+    for (let row = 0; row < 12; row++) {
+        for (let col = 0; col < 12; col++) {
+            if (board[row][col] === 1) blackCount++;
+            else if (board[row][col] === 2) whiteCount++;
+        }
+    }
+
+    if (blackCount > whiteCount) return 'Ganó el Jugador Negro!';
+    else if (whiteCount > blackCount) return 'Ganó el Jugador Blanco!';
+    else return 'Empate!';
 }
 
 // Añadir jugador
@@ -147,4 +205,13 @@ startGameButton.addEventListener('click', () => {
     gameActive = true;
     initBoard();
     playerTurnElement.textContent = `Turno de: Jugador ${currentPlayer}`;
+});
+
+// Reiniciar el juego
+restartButton.addEventListener('click', () => {
+    gameActive = false;
+    numPlayers = 1;
+    currentPlayer = 1;
+    board = [];
+    renderBoard();
 });

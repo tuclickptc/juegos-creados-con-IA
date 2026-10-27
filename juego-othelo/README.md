@@ -8,7 +8,7 @@ Este es un juego de Othelo implementado en HTML, CSS y JavaScript.
 3. Juega haciendo clic en las casillas del tablero.
 
 ## Funcionalidades
-- Tablero de 8x8.
+- Tablero de 12x12.
 - Dos jugadores (negras y blancas).
 - Lógica de movimiento y captura de fichas.
 
