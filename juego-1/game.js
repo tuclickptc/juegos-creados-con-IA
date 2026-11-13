@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth - 20;
 canvas.height = window.innerHeight - 20;
 
+let mode = 'arcade'; // arcade, story, coop
 let level = 1;
 let score = 0;
 let obstacles = [];
@@ -76,13 +77,60 @@ function draw() {
     // Add game logic here
 }
 
+const collisionSound = new Audio('sounds/collision.mp3');
+const levelUpSound = new Audio('sounds/levelup.mp3');
+
+function playCollisionSound() {
+    collisionSound.play();
+}
+
+function playLevelUpSound() {
+    levelUpSound.play();
+}
+
+let gameState = 'start'; // start, playing, end
+
+function showStartScreen() {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '48px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText('Press Space to Start', canvas.width / 2 - 150, canvas.height / 2);
+}
+
+function showEndScreen() {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '48px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
+}
+
 function update() {
-    score += 1;
-    if (score % 100 === 0) {
-        level += 1;
+    if (gameState === 'start') {
+        showStartScreen();
+    } else if (gameState === 'playing') {
+        score += 1;
+        if (score % 100 === 0) {
+            level += 1;
+            playLevelUpSound();
+        }
+        draw();
+    } else if (gameState === 'end') {
+        showEndScreen();
     }
-    draw();
+
     requestAnimationFrame(update);
 }
+
+canvas.addEventListener('touchstart', function(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.touches[0].clientX - rect.left;
+    const y = event.touches[0].clientY - rect.top;
+
+    if (gameState === 'start' && x > canvas.width / 2 - 150 && x < canvas.width / 2 + 150 && y > canvas.height / 2 - 30 && y < canvas.height / 2 + 30) {
+        gameState = 'playing';
+    }
+});
 
 update();
